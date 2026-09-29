@@ -1,0 +1,287 @@
+﻿
+@{
+}
+
+@model ReportVM
+
+<style>
+    .report-wrapper {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        color: #000;
+        margin: 10px;
+    }
+
+    .report-title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 14px;
+    }
+
+    th {
+        background: #eef3ff;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .section-header {
+        background: #dbe7ff;
+        font-weight: bold;
+        text-align: left;
+        padding: 6px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .no-print {
+        margin-bottom: 8px;
+        text-align: right;
+    }
+
+    @@media print {
+        body * {
+            visibility: hidden !important;
+        }
+        #printArea,
+        #printArea * {
+            visibility: visible !important;
+        }
+        #printArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    .header-table,
+    .header-table td {
+        border: none !important;
+        border-collapse: collapse;
+    }
+
+    .header-table {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .header-left {
+        width: 25%;
+        vertical-align: middle;
+        padding: 12px;
+    }
+
+    .header-center {
+        width: 50%;
+        text-align: center;
+        padding: 14px;
+    }
+
+    .header-label {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .header-sheet {
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .header-title {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .header-subtitle {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+
+</style>
+
+<div class="report-wrapper" id="printArea" style="border:solid 1px black;padding:1rem;">
+
+    @* <div class="report-title">
+        Ananda Foods<br />
+        Grading Batch Report
+    </div> *@
+
+    <div class="no-print">
+        <div>
+        <a href="/Index?batchId=@Model.Batch.BatchId&edit=true"
+           class="btn btn-warning btn-sm fw-bold">
+            Edit
+        </a>
+        <button onclick="window.print()"
+                class="btn btn-primary btn-sm fw-bold">
+            Print Report
+        </button>
+        </div>
+    </div>
+
+    <div style="text-align:center; padding:14px 12px;">
+        <div style="font-size:22px; font-weight:700;" class="header-title">
+            ANANDA FOODS
+        </div>
+        <div style="font-size:15px; font-weight:600;" class="header-subtitle">
+            GRADING SHEET
+        </div>
+    </div>
+    <table style="width:25%">
+        <tr>
+            <td width="25%">Sl No:</td>
+            <td style="font-weight:700; font-size:22px; color:red; text-align:center">@Model.Batch.SheetNo</td>
+        </tr>
+        <tr>
+            <td>Date:</td>
+            <td>
+                @Model.Batch.BatchDate.ToString("dd-MMM-yyyy")
+            </td>
+        </tr>
+       
+    </table>
+
+
+    <table class="table table-bordered">
+        <thead>
+           
+            <tr>
+                <th colspan="6" class="section-header">Batch Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>From</td>
+                <td>@Model.Batch.From</td>
+                <td>Average Count</td>
+                <td>@Model.Batch.AvgCount</td>
+            </tr>
+            <tr>
+                <td>Vehicle</td>
+                <td>@Model.Batch.VehicleNo</td>
+                <td>B2</td>
+                <td>@Model.Batch.B2</td>
+            </tr>
+            <tr>
+                <td>Center</td>
+                <td>@Model.Batch.Center</td>
+                <td>B4</td>
+                <td>@Model.Batch.B4</td>
+            </tr>
+
+            <tr>
+                <td>HL / HOT</td>
+                <td>@Model.Batch.HLHot</td>
+                <td>Shrimp / Sec</td>
+                <td>@Model.Batch.ShrimpPerSec</td>
+            </tr>
+
+            <tr>
+                <td>HL Count</td>
+                <td>@Model.Batch.HLCount</td>
+                <td>G2</td>
+                <td>@Model.Batch.G2</td>
+            </tr>
+
+            <tr>
+                <td>Sample Count</td>
+                <td>@Model.Batch.SamCount</td>
+                <td>Remarks</td>
+                <td colspan="3">@Model.Batch.Remarks</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th colspan="6" class="section-header">Grading Details</th>
+            </tr>
+            <tr>
+                <th>BIN</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Manual</th>
+                <th>Screen</th>
+                <th>B / S</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Screenings)
+            {
+                <tr>
+                    <td class="text-center">@s.BIN</td>
+                    <td class="text-right">@s.From</td>
+                    <td class="text-right">@s.To</td>
+                    <td class="text-right">@s.Manual</td>
+                    <td class="text-right">@s.Screen</td>
+                    <td class="text-right">@s.BS</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th colspan="7" class="section-header">Grading Summary</th>
+            </tr>
+            <tr>
+                <th>Grade</th>
+                <th>Variety</th>
+                <th>Count</th>
+                <th>B / S</th>
+                <th>Kgs</th>
+                <th>Percent (%)</th>
+                <th>PO Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var g in Model.Summaries)
+            {
+                <tr>
+                    <td class="text-center">@g.Grade.Name</td>
+                    <td class="text-center">@g.ProductVariety.Name</td>
+                    <td class="text-right">@g.Count</td>
+                    <td class="text-right">@g.BS</td>
+                    <td class="text-right">@g.Kgs.ToString("0.00")</td>
+                    <td class="text-right">@g.Percentage.ToString("0.00")</td>
+                    <td class="text-center">@g.PONumber</td>
+                </tr>
+            }
+            <tr>
+                <th colspan="4" class="text-right">TOTAL</th>
+                <th class="text-right">@Model.TotalKgs.ToString("0.00")</th>
+                <th colspan="2"></th>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <strong>Start Time:</strong>
+        @Model.Batch.StartTime.ToString("dd-MM-yyyy HH:mm")
+        </br>
+        <strong>End Time:</strong>
+        @Model.Batch.EndTime?.ToString("dd-MM-yyyy HH:mm")
+    </div>
+
+</div>
