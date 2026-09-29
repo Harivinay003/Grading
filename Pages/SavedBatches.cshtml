@@ -1,0 +1,113 @@
+﻿@page
+@model SavedBatchesModel
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+
+    <h1 class="text-center">@Configuration["AppSettings:ApplicationTitle"]</h1>
+    <h3 class="text-center">Grading – Saved Batches</h3>
+    <hr />
+
+    <form method="post">
+        <div class="d-flex gap-3 align-items-end">
+            <div class="col-md-3">
+                <label>Date</label>
+                <input asp-for="Date" type="date" class="form-control" />
+            </div>
+            <button asp-page-handler="SearchByDate"
+                    class="btn btn-primary">
+                Search
+            </button>
+        </div>
+    </form>
+
+    @if (Model.Batches != null && Model.Batches.Any())
+    {
+        <table class="table table-bordered table-striped mt-4">
+            <thead class="table-info small">
+                <tr style="text-align:center; font-weight: bold">
+                    <th>Sl No.</th>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>Vehicle</th>
+                    <th>Center</th>
+                    <th>Saved Time</th>
+                    <th>End Time</th>
+                    <th>Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var batch in Model.Batches)
+                {
+                    <tr>
+                    <td>@batch.SheetNo</td>
+                        <td>@batch.BatchDate.ToString("dd-MMM-yyyy")</td>
+                        <td>@batch.From</td>
+                        <td>@batch.VehicleNo</td>
+                        <td>@batch.Center</td>
+                        <td>@batch.StartTime.ToString("HH:mm")</td>
+                        <td>@batch.EndTime?.ToString("HH:mm")</td>
+                        <td class="text-center">
+                            <button type="button"
+                                    class="btn btn-info btn-sm"
+                                    id="btn-@batch.BatchId"
+                                    onclick="getReport(@batch.BatchId)">
+                                View
+                            </button>
+
+                        </td>
+                    </tr>
+
+                    <tr id="report-row-@batch.BatchId" style="display:none;">
+                        <td colspan="8" class="p-0">
+                            <div id="report-container-@batch.BatchId"
+                                 class="border p-2 bg-light">
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center mt-4">
+            No batches found for the selected date.
+        </div>
+    }
+   }
+
+<script>
+    let openBatchId = null;
+
+    function getReport(batchId) {
+
+        const row = document.getElementById("report-row-" + batchId);
+        const container = document.getElementById("report-container-" + batchId);
+        const btn = document.getElementById("btn-" + batchId);
+
+        if (openBatchId === batchId) {
+            row.style.display = "none";
+            btn.innerText = "View";
+            openBatchId = null;
+            return;
+        }
+
+        if (openBatchId !== null) {
+            document.getElementById("report-row-" + openBatchId).style.display = "none";
+            document.getElementById("btn-" + openBatchId).innerText = "View";
+        }
+        row.style.display = "table-row";
+        btn.innerText = "Close";
+        openBatchId = batchId;
+
+        if (container.innerHTML.trim() === "") {
+            fetch(`/SavedBatches?handler=LoadReport&batchId=${batchId}`)
+                .then(r => r.text())
+                .then(html => container.innerHTML = html);
+        }
+
+        row.scrollIntoView({ behavior: "smooth" });
+    }
+</script>
+
+
